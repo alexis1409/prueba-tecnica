@@ -1,118 +1,143 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, Image, View, FlatList} from 'react-native';
+import Header from './src/components/Header';
+import { black, fondo, white } from './src/utils/colors';
+import axios from 'axios';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FIRSTAPPENTER, URLAPI } from './src/utils/names';
+import { inserBank, queryBanks } from './src/database/realmDB';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const App = () => {
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+  const [banksList, setBanksList] = useState([]);
+  const [firstEnter, setFirstEnter] = useState(false);
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  useEffect(() => {
+    // valit();
+    consultaApi();
+  }, [])
+
+
+  // const valit = async () => {
+  //   const firtapp = await AsyncStorage.getItem(FIRSTAPPENTER);
+  //   if(firtapp == 'active'){
+  //     consultaRealm();
+  //     setFirstEnter(true);
+  //   }else{
+  //     consultaApi();
+  //     setFirstEnter(false);
+  //   }
+  // }
+
+  const consultaApi = async () => {
+    axios.get(URLAPI)
+    .then(response => {
+      setBanksList(response.data);
+      // AsyncStorage.setItem(FIRSTAPPENTER, 'active');
+      // insert();
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
+
+  // const consultaRealm = async () => 
+  //   queryBanks().then((listBanks) => { 
+  //     setBanksList(listBanks);
+  //   }).catch((error) => {
+  //       console.log(error);
+  //   });
+  // }
+
+  // const insert = async () => {
+  //   for(let i = 0; i < banksList.length; i++){
+  //     const data = {
+  //       id:  Date.now()+''+Date.now(),
+  //       bankName: banksList[i].bankName,
+  //       description: banksList[i].description,
+  //       age: Number(banksList[i].age),
+  //       url: banksList[i].url
+  //     }
+        
+  //     inserBank(data).then((res) =>{
+  //       console.log(res);
+  //     }).catch((error) => { console.log(error) })
+       
+  //   }
+    
+  // }
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
+    <SafeAreaView style={{backgroundColor: '#000'}}>
+      <StatusBar translucent={true} backgroundColor={'transparent'} />
+      
         <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+        <View style={styles.containerList}>
+          <FlatList
+              // refreshControl={<RefreshControl refreshing={refreshing}  onRefresh={onRefresh}/>}
+              style={styles.flatList}
+              data={ banksList }
+              keyExtractor={(item) => item.bankName}
+              renderItem={({item, index}) => 
+                <View style={styles.containerInputFlatList}>
+                  <View style={styles.contentTextTitle}>
+                    <Image 
+                      style={styles.imgList}
+                      source={{ uri: item.url }}
+                    />
+                    <Text style={styles.nameList}>{item.bankName}</Text>
+                  </View>
+                  <View>
+                    <Icon name="navigate-next" color={black} size={30} />
+                  </View>
+                    
+                    {/* <Text>{item.cadena_nombre}</Text> */}
+                </View>
+              }
+            />
         </View>
-      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
+ containerList: {
+  backgroundColor: fondo,
+  paddingHorizontal: 15
+ },
+ flatList: {
+  marginTop: 10,
+  marginBottom: 80
+},
+containerInputFlatList: {
+  backgroundColor: white,
+  marginBottom: 10,
+  borderRadius: 10,
+  padding: 10,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between'
+},
+imgList: {
+  width: 50,
+  height: 50,
+  borderRadius: 8
+},
+  
+nameList: {
+  marginLeft: 5,
+  color: black,
+  fontSize: 17,
+  fontWeight: '600',
+  textTransform: 'uppercase'
+},
+contentTextTitle: {
+  justifyContent: 'space-between',
+  flexDirection: 'row',
+  alignItems: 'center'
+}
 });
 
 export default App;
