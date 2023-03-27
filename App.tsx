@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FIRSTAPPENTER, URLAPI } from './src/utils/names';
 import { inserBank, queryBanks } from './src/database/realmDB';
 import { stylesApp } from './src/styles/stilos';
+import { black } from './src/utils/colors';
 
 const App = () => {
 
@@ -105,8 +106,7 @@ const App = () => {
                     <Text style={stylesApp.nameList}>{item.bankName}</Text>
                   </View>
                   <View>
-                    <Text style={stylesApp.btnLeft}> > </Text>
-                    {/* <Icon name="navigate-next" color={black} size={30} /> */}
+                    <Icon name="navigate-next" color={black} size={30} />
                   </View>
                 </Pressable>
               }
@@ -124,8 +124,7 @@ const App = () => {
                 <Pressable
                   onPress={() => setModalVisible(false)}
                 > 
-                  <Text style={stylesApp.btnSalir}>X</Text>
-                  {/* <Icon name="close" color={black} size={25} />  */}
+                  <Icon name="close" color={black} size={25} /> 
                 </Pressable>
               </View>
 
